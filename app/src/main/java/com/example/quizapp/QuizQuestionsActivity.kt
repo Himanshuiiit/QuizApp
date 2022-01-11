@@ -1,5 +1,6 @@
 package com.example.quizapp
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.AdaptiveIconDrawable
@@ -17,10 +18,14 @@ class QuizQuestionsActivity : AppCompatActivity(),View.OnClickListener {
     private var mCurrentPosition:Int = 1
     private var mQuestionList : ArrayList<Question>? = null
     private var mSelectedPosition: Int = 0
+    private var mCorrectAnswers: Int = 0
+    private var mUserName: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_questions)
 
+        mUserName = intent.getStringExtra(Constants.USER_NAME)
         mQuestionList = Constants.getQuestions()
         setQuestion()
 
@@ -85,13 +90,19 @@ class QuizQuestionsActivity : AppCompatActivity(),View.OnClickListener {
                         mCurrentPosition <= mQuestionList!!.size ->{
                             setQuestion()
                         }else->{
-                            Toast.makeText(this,"You have successfully complited the quiz",Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this,ResultActivity::class.java)
+                            intent.putExtra(Constants.USER_NAME,mUserName)
+                            intent.putExtra(Constants.CORRECT_ANSWER,mCorrectAnswers)
+                            intent.putExtra(Constants.TOTAL_QUESTIONS,mQuestionList!!.size)
+                        startActivity(intent)
                         }
                     }
                 }else{
                     val question = mQuestionList!!.get(mCurrentPosition-1)
                     if(question!!.correctOption!=mSelectedPosition){
                         answerView(mSelectedPosition,R.drawable.incorrect_option_bg)
+                    }else{
+                        mCorrectAnswers++
                     }
                     answerView(question.correctOption,R.drawable.correct_option_bg)
 
